@@ -1,0 +1,128 @@
+# version: '3.8'
+
+services:
+
+  # Base de données MongoDB
+  mongodb:
+    image : mongo:7.0
+    container_name: my_mongo
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: datascientest
+      MONGO_INITDB_ROOT_PASSWORD: dst123
+    volumes:
+      - ./sample_training:/data/db
+      - ./logs:/app/logs
+    ports:
+      - 27017:27017
+    networks:
+      - flight_network
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 10s      # vérifie toutes les 10 secondes
+      timeout: 5s        # échoue si pas de réponse en 5s
+      retries: 5         # après 5 échecs consécutifs = unhealthy
+      start_period: 15s
+      
+  pipeline_mongo:
+    build:
+      context: ./Pipeline
+      dockerfile: Dockerfile.pipe
+    container_name: pipeline_mongo
+    environment:
+      lufthansa_token: zcemjb9pfa9x445y8xxesxtf
+      MONGO_HOST: mongodb
+      MONGO_PORT: 27017
+      MONGO_USER: datascientest
+      MONGO_PASS: dst123
+      nb_flight: 1000
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      api:
+        condition: service_healthy
+    networks:
+      - flight_network
+    volumes:
+      - ./logs:/app/logs
+      
+  ml_predictor:
+    build:
+      context: ./API
+      dockerfile: Dockerfile.ml
+    container_name: ml_predictor
+    environment:
+      lufthansa_token: zcemjb9pfa9x445y8xxesxtf
+      MONGO_HOST: mongodb
+      MONGO_PORT: 27017
+      MONGO_USER: datascientest
+      MONGO_PASS: dst123
+      API_BASE_URL: http://api:8000 
+    depends_on:
+      api:
+        condition: service_healthy
+      mongodb:
+        condition: service_healthy
+    networks:
+      - flight_network
+    volumes:
+      - ./logs:/app/logs
+
+  # API locale
+  api:
+    build:
+      context: ./API
+      dockerfile: Dockerfile.api
+    container_name: flight_delay_api
+    environment:
+      LUFTHANSA_CLIENT_ID: fk676v86arf4vdwex5szces3k
+      LUFTHANSA_CLIENT_SECRET: YxKB7mNgju
+      OPENWEATHER_API_KEY: 04efb25b47f9a5954c7fc417b4a94176
+      MONGO_HOST: mongodb
+      MONGO_PORT: 27017
+      MONGO_USER: datascientest
+      MONGO_PASS: dst123
+    ports:
+      - "0.0.0.0:8000:8000"  # API accessible depuis toutes les interfaces
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks:
+      - flight_network
+    restart: unless-stopped
+    volumes:
+      - ./sample_training:/data/db
+      - ./logs:/app/logs  # Données persistantes dans le dossier logs/
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.vuejs
+      args:
+        VITE_API_BASE_URL: "${API_BASE_URL}"
+    environment:
+      VITE_API_BASE_URL: "${API_BASE_URL}"
+    container_name: frontend
+    restart: always
+    ports:
+      - "8080:8080"
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      api:
+        condition: service_healthy
+    networks:
+      - flight_network
+
+volumes:
+  postgres_data:
+    driver: local
+  ml_models:
+    driver: local
+networks:
+  flight_network:
+    driver: bridge

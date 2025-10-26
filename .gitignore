@@ -1,0 +1,39 @@
+# --- Bases de données ---
+data/bdd_postgres/
+data/redis/
+
+# --- Fichiers de logs ---
+*.log
+logs/
+*.pid
+
+# --- Docker ---
+# Éviter de versionner les données persistantes
+**/docker-data/
+**/volumes/
+**/.docker/
+
+# Fichiers générés par Docker Compose
+*.env
+.env.local
+.env.*.local
+
+# --- Python (si le projet en contient) ---
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pkl
+*.sqlite3
+
+# --- VSCode / IDE ---
+.vscode/
+.idea/
+*.swp
+
+# --- OS spécifiques ---
+.DS_Store
+Thumbs.db
+
+# ---  ---
+sample_training

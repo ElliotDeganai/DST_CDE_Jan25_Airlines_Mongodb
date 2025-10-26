@@ -1,0 +1,123 @@
+# version: '3.8'
+
+services:
+  # Base de données PostgreSQL
+
+  # Base de données MongoDB
+  mongodb:
+    image : mongo:7.0
+    container_name: my_mongo
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: datascientest
+      MONGO_INITDB_ROOT_PASSWORD: dst123
+    networks:
+      - flight_network
+    volumes:
+      - ./sample_training:/data/db
+      - ./logs:/app/logs  # Données persistantes dans le dossier logs/
+    ports:
+      - 27017:27017  # On a besoin d'exporter ce port ?
+
+  pipeline_mongo:
+    build:
+      context: ./Pipeline
+      dockerfile: Dockerfile.pipeline
+    container_name: pipeline_mongo
+    networks:
+      - flight_network
+    volumes:
+      - ./logs:/app/logs
+
+  # API locale
+  api:
+    build:
+      context: ./API
+      dockerfile: Dockerfile.api
+    container_name: flight_delay_api
+    environment:
+      DATABASE_URL: postgresql://user:password@db:5432/flight_delays
+      LUFTHANSA_CLIENT_ID: fk676v86arf4vdwex5szces3k
+      LUFTHANSA_CLIENT_SECRET: YxKB7mNgju
+      OPENWEATHER_API_KEY: 04efb25b47f9a5954c7fc417b4a94176
+    ports:
+      - "0.0.0.0:8000:8000"  # API accessible depuis toutes les interfaces
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - flight_network
+    restart: unless-stopped
+    volumes:
+      - ml_models:/app/models
+      - ./logs:/app/logs  # Données persistantes dans le dossier logs/
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+
+  # Service ML pour l'entraînement
+  ml_trainer:
+    build:
+      context: ./API
+      dockerfile: Dockerfile.ml
+    container_name: flight_ml_trainer
+    environment:
+      DATABASE_URL: postgresql://user:password@db:5432/flight_delays
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - flight_network
+    volumes:
+      - ml_models:/app/models
+      - ./logs:/app/logs  # Données persistantes dans le dossier logs/
+    restart: "no"
+
+  # Frontend Dash
+  dashboard:
+    build:
+      context: ./dashboard
+      dockerfile: Dockerfile.dash
+    container_name: flight_delay_dashboard
+    environment:
+      API_BASE_URL: http://api:8000
+      DATABASE_URL: postgresql://user:password@db:5432/flight_delays
+    ports:
+      - "0.0.0.0:8050:8050"
+    depends_on:
+      - api
+    networks:
+      - flight_network
+    #restart: unless-stopped
+    restart: "no"
+    volumes:
+      - ./logs:/app/logs  # Données persistantes dans le dossier logs/
+
+  # Redis (pas utilisé... à voir si c'est utile)
+  # redis:
+  #   image: redis:7-alpine
+  #   container_name: flight_delay_redis
+  #   # ports:
+  #   #   - "0.0.0.0:6379:6379"
+  #   networks:
+  #     - flight_network
+  #   restart: unless-stopped
+  #   command: redis-server --appendonly yes
+  #   volumes:
+  #     # - redis_data:/data
+  #     - ./data/redis:/data  # Données persistantes dans le dossier data/redis
+  #     # - ./logs:/app/logs  # Données persistantes dans le dossier logs/
+
+volumes:
+  postgres_data:
+    driver: local
+  ml_models:
+    driver: local
+  # redis_data:
+  #   driver: local
+
+networks:
+  flight_network:
+    driver: bridge

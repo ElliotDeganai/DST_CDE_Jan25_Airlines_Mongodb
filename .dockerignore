@@ -1,0 +1,39 @@
+# --- Éviter de copier les données dans les builds ---
+data/bdd_postgres/
+data/redis/
+data/json/
+
+# --- Logs ---
+*.log
+logs/
+*.pid
+
+# --- Environnements ---
+.env
+.env.local
+.env.*.local
+
+# --- Cache et fichiers Python compilés ---
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pkl
+*.sqlite3
+
+# --- VCS (Git, etc.) ---
+.git
+.gitignore
+.gitattributes
+
+# --- Fichiers IDE ---
+.vscode/
+.idea/
+*.swp
+
+# --- OS spécifiques ---
+.DS_Store
+Thumbs.db
+
+# --- Docker files inutiles ---
+docker-compose.override.yml

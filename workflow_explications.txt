@@ -1,0 +1,7 @@
+Tous les jours le workflow suivant se lance :
+
+Appels API pour charger les données des vols du jour sur le périmètre
+Appels API pour charger les données météo du jour pour les aéroports du périmètre (utilisation de la position des aéroports)
+Le model de machine learning calcule le retard des vols de la journée en se basant sur l'historique des vols et les données météo de notre base
+La prediction du retard est chargée dans la collection flight
+

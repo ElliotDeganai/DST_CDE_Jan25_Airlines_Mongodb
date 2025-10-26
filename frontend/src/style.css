@@ -1,0 +1,13 @@
+@import "tailwindcss";
+
+.table-header {
+  @apply flex flex-wrap font-bold py-4  bg-green-950 text-white w-full;
+}
+
+.table-row {
+  @apply w-1/9 px-4;
+}
+
+.table-stats-row {
+  @apply w-1/8 px-4 text-center border;
+}

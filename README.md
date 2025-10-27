@@ -23,10 +23,6 @@ cd DST_CDE_Jan25_Airlines
 > - lors d'une première installation,
 > - si on change d'hôte et/ou d'identifiants API
 
-### 4. Lancer le script `install.sh`
-```shell
-bash install.sh
-```
 ## 🚀 Création de zero dec tous les services
 ```shell
 bash restart.sh

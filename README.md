@@ -23,7 +23,7 @@ cd DST_CDE_Jan25_Airlines
 > - lors d'une première installation,
 > - si on change d'hôte et/ou d'identifiants API
 
-## 🚀 Création de zero dec tous les services
+## 🚀 Création de zero de tous les services
 ```shell
 bash restart.sh
 ```

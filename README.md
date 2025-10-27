@@ -35,7 +35,3 @@ bash restart.sh
 ```shell
 bash start.sh
 ```
-
-### 🔍 Surveillance
-- Les logs des containers se trouvent dans le dossier `logs/`
-- Des indicateurs de statut sont affichés dans l'onglet "Maintenance", sur l'interface

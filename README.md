@@ -27,13 +27,14 @@ cd DST_CDE_Jan25_Airlines
 bash install.sh
 ```
 ## 🚀 Création de zero dec tous les services
+```shell
 bash restart.sh
+```
 
 ## 🚀 Démarrage
 Lancer le script `manage.sh` avec l'option `start`
 ```shell
-bash start.sh start
-```
+bash start.sh
 ```
 
 ### 🔍 Surveillance

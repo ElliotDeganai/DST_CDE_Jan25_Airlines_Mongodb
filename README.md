@@ -1,7 +1,8 @@
-# ✈️ DST_CDE_Jan25_Airlines
-Dépôt support du projet "DST Airlines" pour la cohorte Data engineer (continue) de janvier 2025
+# ✈️ DST_CDE_Jan25_Airlines MongoDB
+Dépôt support du projet "DST Airlines" pour la cohorte Data engineer (continue) de janvier 2025, Version MongoDB
 
-<img width="1649" height="868" alt="image" src="https://github.com/user-attachments/assets/2d610c10-7f24-4037-a285-09503931339e" />
+<img width="1657" height="882" alt="image" src="https://github.com/user-attachments/assets/4cfb2da2-5284-4a65-a8c7-cdbbd9457679" />
+
 
 ## 🧑‍🔧 Installation
 

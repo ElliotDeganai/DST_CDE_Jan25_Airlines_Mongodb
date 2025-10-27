@@ -32,7 +32,6 @@ bash restart.sh
 ```
 
 ## 🚀 Démarrage
-Lancer le script `manage.sh` avec l'option `start`
 ```shell
 bash start.sh
 ```
